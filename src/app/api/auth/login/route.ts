@@ -25,12 +25,14 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const data = (await res.json()) as { accessToken: string };
+  // 백엔드는 ApiResponse<AdminTokenResponse> 구조: { success, data: { accessToken } }
+  const resData = (await res.json()) as { data: { accessToken: string } };
+  const accessToken = resData.data.accessToken;
 
   // httpOnly 쿠키로 토큰 발급
   const isProduction = process.env.NODE_ENV === 'production';
   const cookieOptions = [
-    `access_token=${data.accessToken}`,
+    `access_token=${accessToken}`,
     'HttpOnly',
     'Path=/',
     'SameSite=Lax',
