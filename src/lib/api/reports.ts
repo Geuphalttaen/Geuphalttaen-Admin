@@ -14,11 +14,11 @@ export async function getReports(
   const { status, ...rest } = params;
   const queryParams = status && status !== 'ALL' ? { ...rest, status } : rest;
 
-  const response = await apiClient.get<PageResponse<ReportListItem>>(
+  const response = await apiClient.get<ApiResponse<PageResponse<ReportListItem>>>(
     '/api/v1/admin/reports',
     { params: queryParams }
   );
-  return response.data;
+  return response.data.data;
 }
 
 /**
@@ -56,6 +56,6 @@ export interface ReportStats {
  * 제보 통계 조회 — 상태별 카운트
  */
 export async function getReportStats(): Promise<ReportStats> {
-  const response = await apiClient.get<ReportStats>('/api/v1/admin/reports/stats');
-  return response.data;
+  const response = await apiClient.get<ApiResponse<ReportStats>>('/api/v1/admin/reports/stats');
+  return response.data.data;
 }

@@ -10,11 +10,11 @@ import type { Toilet, ToiletListParams, ToiletUpdateRequest } from '@/types/toil
 export async function getToilets(
   params: ToiletListParams
 ): Promise<PageResponse<Toilet>> {
-  const response = await apiClient.get<PageResponse<Toilet>>(
+  const response = await apiClient.get<ApiResponse<PageResponse<Toilet>>>(
     '/api/v1/admin/toilets',
     { params }
   );
-  return response.data;
+  return response.data.data;
 }
 
 /**
