@@ -2,6 +2,7 @@
 
 // 관리자 로그인 페이지
 
+import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -39,11 +40,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-xl border border-gray-100">
         {/* 로고 헤더 */}
         <div className="flex flex-col items-center gap-3 mb-8">
-          <svg width="48" height="48" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-            <rect width="28" height="28" rx="8" fill="#4f46e5" />
-            <path d="M14 6C11.24 6 9 8.24 9 11c0 2.76 2.24 5 5 5s5-2.24 5-5c0-2.76-2.24-5-5-5z" fill="white" />
-            <path d="M8 22c0-3.31 2.69-6 6-6s6 2.69 6 6" stroke="white" strokeWidth="2" strokeLinecap="round" />
-          </svg>
+          <Image src="/icon.png" alt="급할땐 로고" width={56} height={56} className="rounded-2xl" />
           <div>
             <h1 className="text-2xl font-bold text-gray-900 text-center">
               급할땐 <span className="text-indigo-600">Admin</span>
@@ -67,7 +64,7 @@ export default function LoginPage() {
               type="email"
               placeholder="admin@example.com"
               {...register('email')}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
             />
             {errors.email && (
               <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>
@@ -87,7 +84,7 @@ export default function LoginPage() {
               type="password"
               placeholder="••••••••"
               {...register('password')}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
             />
             {errors.password && (
               <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>

@@ -2,6 +2,7 @@
 
 // 사이드바 네비게이션 컴포넌트
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
@@ -52,12 +53,8 @@ export default function Sidebar() {
   return (
     <aside className="flex h-full w-64 flex-col bg-indigo-950 text-white">
       {/* 로고 영역 */}
-      <div className="flex h-16 items-center gap-3 border-b border-indigo-800 px-6">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-          <rect width="28" height="28" rx="8" fill="#6366f1" />
-          <path d="M14 6C11.24 6 9 8.24 9 11c0 2.76 2.24 5 5 5s5-2.24 5-5c0-2.76-2.24-5-5-5z" fill="white" />
-          <path d="M8 22c0-3.31 2.69-6 6-6s6 2.69 6 6" stroke="white" strokeWidth="2" strokeLinecap="round" />
-        </svg>
+      <div className="flex h-16 items-center gap-3 border-b border-indigo-800 px-5">
+        <Image src="/icon.png" alt="급할땐 로고" width={32} height={32} className="rounded-lg" />
         <span className="text-xl font-bold text-white">
           급할땐<span className="text-indigo-300 text-xs font-medium ml-1">Admin</span>
         </span>
