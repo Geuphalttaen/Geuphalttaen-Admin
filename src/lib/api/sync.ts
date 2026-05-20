@@ -3,11 +3,15 @@
 import apiClient from './client';
 import type { ApiResponse } from '@/types/common';
 
-/** 동기화 상태 */
-export interface SyncStatus {
-  lastSyncAt: string | null;
-  status: 'IDLE' | 'RUNNING' | 'SUCCESS' | 'FAILED';
-  message?: string;
+/** 동기화 결과 단건 */
+export interface SyncResult {
+  id: number;
+  status: 'RUNNING' | 'SUCCESS' | 'FAILED';
+  totalFetched: number;
+  upsertedCount: number;
+  failedCount: number;
+  errorMessage: string | null;
+  syncedAt: string;
 }
 
 /** 동기화 트리거 응답 */
@@ -26,10 +30,10 @@ export async function triggerSync(): Promise<SyncTriggerResponse> {
 }
 
 /**
- * 동기화 상태 조회 (마지막 동기화 시각 포함)
+ * 동기화 결과 목록 조회 (최근 순)
  */
-export async function getSyncStatus(): Promise<SyncStatus> {
-  const response = await apiClient.get<ApiResponse<SyncStatus>>(
+export async function getSyncStatus(): Promise<SyncResult[]> {
+  const response = await apiClient.get<ApiResponse<SyncResult[]>>(
     '/api/v1/admin/toilets/sync/status'
   );
   return response.data.data;
