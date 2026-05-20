@@ -11,6 +11,11 @@ async function proxy(request: NextRequest, path: string[]): Promise<NextResponse
   const cookieStore = await cookies();
   const token = cookieStore.get('access_token')?.value;
 
+  // B-4: 토큰 없으면 백엔드 호출 없이 즉시 401 반환
+  if (!token) {
+    return NextResponse.json({ ok: false, message: '인증이 필요합니다.' }, { status: 401 });
+  }
+
   const targetPath = `/api/v1/admin/${path.join('/')}`;
   const url = new URL(targetPath, BACKEND_URL);
 
@@ -21,10 +26,8 @@ async function proxy(request: NextRequest, path: string[]): Promise<NextResponse
 
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`,
   };
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
 
   let body: BodyInit | undefined;
   const method = request.method;
