@@ -169,6 +169,7 @@ export default function ToiletsPage() {
             data={data?.content ?? []}
             emptyMessage="화장실이 없습니다."
             onRowClick={(row) => router.push(`/toilets/${row.id}`)}
+            getRowKey={(row) => row.id}
           />
 
           {/* 페이지네이션 */}

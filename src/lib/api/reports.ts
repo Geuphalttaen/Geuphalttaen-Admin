@@ -44,3 +44,18 @@ export async function approveReport(id: number): Promise<void> {
 export async function rejectReport(id: number): Promise<void> {
   await apiClient.patch(`/api/v1/admin/reports/${id}/reject`);
 }
+
+/** 제보 통계 응답 */
+export interface ReportStats {
+  pending: number;
+  active: number;
+  rejected: number;
+}
+
+/**
+ * 제보 통계 조회 — 상태별 카운트
+ */
+export async function getReportStats(): Promise<ReportStats> {
+  const response = await apiClient.get<ReportStats>('/api/v1/admin/reports/stats');
+  return response.data;
+}

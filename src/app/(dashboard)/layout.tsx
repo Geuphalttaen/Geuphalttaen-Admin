@@ -1,11 +1,11 @@
 'use client';
 
 // 대시보드 인증 가드 레이아웃
-// 토큰이 없으면 /login으로 리다이렉트
+// 인증 엔드포인트 호출로 토큰 유효성 검증 후 미인증 시 /login으로 리다이렉트
 
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { ACCESS_TOKEN_KEY } from '@/lib/constants';
+import apiClient from '@/lib/api/client';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
@@ -38,13 +38,17 @@ export default function DashboardGroupLayout({
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    // 인증 토큰 확인
-    const token = localStorage.getItem(ACCESS_TOKEN_KEY);
-    if (!token) {
-      router.replace('/login');
-    } else {
-      setIsChecking(false);
-    }
+    // 인증된 엔드포인트에 경량 요청으로 토큰 유효성 서버 검증
+    apiClient
+      .get('/api/v1/admin/reports/stats')
+      .then(() => {
+        setIsChecking(false);
+      })
+      .catch(() => {
+        // 401 또는 네트워크 오류 → 인터셉터가 /login으로 리다이렉트
+        // interceptor가 처리하지 못한 케이스 대비 명시적 리다이렉트
+        router.replace('/login');
+      });
   }, [router]);
 
   // 인증 확인 중 로딩 표시

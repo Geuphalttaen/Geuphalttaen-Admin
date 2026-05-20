@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useReports, useApproveReport, useRejectReport } from '@/hooks/useReports';
+import { useReports, useReportStats, useApproveReport, useRejectReport } from '@/hooks/useReports';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import Table from '@/components/ui/Table';
@@ -34,11 +34,8 @@ function StatusCard({
 export default function DashboardPage() {
   const router = useRouter();
 
-  // 모든 제보 조회 (통계용)
-  const { data: allReports, isLoading: isLoadingAll } = useReports({
-    page: 0,
-    size: 1000,
-  });
+  // B-3: 통계 API 직접 호출
+  const { data: stats, isLoading: isLoadingStats } = useReportStats();
 
   // 최근 PENDING 제보 5건
   const { data: pendingReports, isLoading: isLoadingPending } = useReports({
@@ -57,13 +54,6 @@ export default function DashboardPage() {
     reportId: number | null;
   }>({ isOpen: false, type: 'approve', reportId: null });
 
-  /** 상태별 카운트 계산 */
-  const counts = {
-    PENDING: allReports?.content.filter((r) => r.status === 'PENDING').length ?? 0,
-    ACTIVE: allReports?.content.filter((r) => r.status === 'ACTIVE').length ?? 0,
-    REJECTED: allReports?.content.filter((r) => r.status === 'REJECTED').length ?? 0,
-  };
-
   /** 승인/거절 모달 열기 */
   const openModal = (
     e: React.MouseEvent,
@@ -79,11 +69,13 @@ export default function DashboardPage() {
     if (!modal.reportId) return;
     if (modal.type === 'approve') {
       approveMutation.mutate(modal.reportId, {
+        // I-3: 모달 reset 시 type을 현재 type으로 유지
         onSuccess: () => setModal({ isOpen: false, type: 'approve', reportId: null }),
       });
     } else {
       rejectMutation.mutate(modal.reportId, {
-        onSuccess: () => setModal({ isOpen: false, type: 'approve', reportId: null }),
+        // I-3: 거절 성공 후 type을 'reject'로 올바르게 유지
+        onSuccess: () => setModal({ isOpen: false, type: 'reject', reportId: null }),
       });
     }
   };
@@ -150,7 +142,7 @@ export default function DashboardPage() {
     },
   ];
 
-  if (isLoadingAll) {
+  if (isLoadingStats) {
     return (
       <div className="flex items-center justify-center py-20">
         <LoadingSpinner size="lg" />
@@ -160,11 +152,11 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* 현황 요약 카드 */}
+      {/* 현황 요약 카드 — 통계 API 직접 사용 */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatusCard label="대기 중 제보" count={counts.PENDING} colorClass="text-yellow-600" />
-        <StatusCard label="승인된 화장실" count={counts.ACTIVE} colorClass="text-green-600" />
-        <StatusCard label="거절된 제보" count={counts.REJECTED} colorClass="text-red-600" />
+        <StatusCard label="대기 중 제보" count={stats?.pending ?? 0} colorClass="text-yellow-600" />
+        <StatusCard label="승인된 화장실" count={stats?.active ?? 0} colorClass="text-green-600" />
+        <StatusCard label="거절된 제보" count={stats?.rejected ?? 0} colorClass="text-red-600" />
       </div>
 
       {/* 최근 PENDING 제보 목록 */}
@@ -190,6 +182,7 @@ export default function DashboardPage() {
             data={pendingReports?.content ?? []}
             emptyMessage="대기 중인 제보가 없습니다."
             onRowClick={(row) => router.push(`/reports/${row.id}`)}
+            getRowKey={(row) => row.id}
           />
         )}
       </div>

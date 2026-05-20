@@ -169,6 +169,7 @@ export default function ReportsPage() {
             data={data?.content ?? []}
             emptyMessage="제보가 없습니다."
             onRowClick={(row) => router.push(`/reports/${row.id}`)}
+            getRowKey={(row) => row.id}
           />
 
           {/* 페이지네이션 */}

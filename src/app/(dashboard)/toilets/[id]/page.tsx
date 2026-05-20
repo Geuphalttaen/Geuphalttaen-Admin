@@ -16,14 +16,18 @@ interface ToiletDetailPageProps {
   params: Promise<{ id: string }>;
 }
 
-/** 화장실 수정 폼 스키마 — 위경도는 문자열로 입력받아 숫자로 변환 */
+/**
+ * 화장실 수정 폼 스키마
+ * I-2: 위경도는 z.coerce.number()로 HTML string input을 숫자로 자동 변환
+ * (react-hook-form의 valueAsNumber 옵션과 함께 사용)
+ */
 const updateToiletSchema = z.object({
   name: z.string().min(1, '화장실명을 입력하세요.'),
   address: z.string().min(1, '주소를 입력하세요.'),
-  /** 위도: input은 string, output은 number */
-  latitude: z.string().refine((v) => !isNaN(parseFloat(v)), '숫자를 입력하세요.'),
-  /** 경도: input은 string, output은 number */
-  longitude: z.string().refine((v) => !isNaN(parseFloat(v)), '숫자를 입력하세요.'),
+  /** I-2: z.number() + register({ valueAsNumber: true }) 로 string → number 변환 */
+  latitude: z.number({ error: '숫자를 입력하세요.' }),
+  /** I-2: z.number() + register({ valueAsNumber: true }) 로 string → number 변환 */
+  longitude: z.number({ error: '숫자를 입력하세요.' }),
   description: z.string().optional(),
   weekdayHours: z.string().optional(),
   weekendHours: z.string().optional(),
@@ -35,16 +39,21 @@ type UpdateToiletFormValues = z.infer<typeof updateToiletSchema>;
 /** 폼 입력 필드 컴포넌트 */
 function FormField({
   label,
+  id,
   error,
   children,
 }: {
   label: string;
+  /** I-7: label htmlFor 연결을 위한 id */
+  id?: string;
   error?: string;
   children: React.ReactNode;
 }) {
   return (
     <div>
-      <label className="mb-1 block text-sm font-medium text-gray-700">{label}</label>
+      <label htmlFor={id} className="mb-1 block text-sm font-medium text-gray-700">
+        {label}
+      </label>
       {children}
       {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
     </div>
@@ -68,14 +77,14 @@ export default function ToiletDetailPage({ params }: ToiletDetailPageProps) {
     resolver: zodResolver(updateToiletSchema),
   });
 
-  // 데이터 로드 후 폼 초기값 설정 (위경도는 string으로 변환)
+  // 데이터 로드 후 폼 초기값 설정
   useEffect(() => {
     if (toilet) {
       reset({
         name: toilet.name,
         address: toilet.address,
-        latitude: String(toilet.latitude),
-        longitude: String(toilet.longitude),
+        latitude: toilet.latitude,
+        longitude: toilet.longitude,
         description: toilet.description ?? '',
         weekdayHours: toilet.operatingHours?.weekday ?? '',
         weekendHours: toilet.operatingHours?.weekend ?? '',
@@ -84,7 +93,7 @@ export default function ToiletDetailPage({ params }: ToiletDetailPageProps) {
     }
   }, [toilet, reset]);
 
-  /** 폼 제출 처리 — 위경도 string → number 변환 */
+  /** 폼 제출 처리 — z.coerce.number()로 위경도는 이미 number */
   const onSubmit = (values: UpdateToiletFormValues) => {
     updateMutation.mutate(
       {
@@ -92,8 +101,8 @@ export default function ToiletDetailPage({ params }: ToiletDetailPageProps) {
         data: {
           name: values.name,
           address: values.address,
-          latitude: parseFloat(values.latitude),
-          longitude: parseFloat(values.longitude),
+          latitude: values.latitude,
+          longitude: values.longitude,
           description: values.description || undefined,
           operatingHours: {
             weekday: values.weekdayHours || undefined,
@@ -152,35 +161,40 @@ export default function ToiletDetailPage({ params }: ToiletDetailPageProps) {
         </h3>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <FormField label="화장실명" error={errors.name?.message}>
-            <input {...register('name')} className={inputClass} />
+          {/* I-7: label htmlFor 연결 */}
+          <FormField id="name" label="화장실명" error={errors.name?.message}>
+            <input id="name" {...register('name')} className={inputClass} />
           </FormField>
 
-          <FormField label="주소" error={errors.address?.message}>
-            <input {...register('address')} className={inputClass} />
+          <FormField id="address" label="주소" error={errors.address?.message}>
+            <input id="address" {...register('address')} className={inputClass} />
           </FormField>
 
-          <FormField label="위도" error={errors.latitude?.message}>
+          {/* I-2: valueAsNumber로 HTML input string → number 자동 변환 */}
+          <FormField id="latitude" label="위도" error={errors.latitude?.message}>
             <input
+              id="latitude"
               type="number"
               step="any"
-              {...register('latitude')}
+              {...register('latitude', { valueAsNumber: true })}
               className={inputClass}
             />
           </FormField>
 
-          <FormField label="경도" error={errors.longitude?.message}>
+          <FormField id="longitude" label="경도" error={errors.longitude?.message}>
             <input
+              id="longitude"
               type="number"
               step="any"
-              {...register('longitude')}
+              {...register('longitude', { valueAsNumber: true })}
               className={inputClass}
             />
           </FormField>
 
           <div className="sm:col-span-2">
-            <FormField label="설명 (선택)" error={errors.description?.message}>
+            <FormField id="description" label="설명 (선택)" error={errors.description?.message}>
               <textarea
+                id="description"
                 {...register('description')}
                 rows={3}
                 className={inputClass}
@@ -195,22 +209,25 @@ export default function ToiletDetailPage({ params }: ToiletDetailPageProps) {
         </h3>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <FormField label="평일">
+          <FormField id="weekdayHours" label="평일">
             <input
+              id="weekdayHours"
               {...register('weekdayHours')}
               placeholder="예: 09:00~18:00"
               className={inputClass}
             />
           </FormField>
-          <FormField label="주말">
+          <FormField id="weekendHours" label="주말">
             <input
+              id="weekendHours"
               {...register('weekendHours')}
               placeholder="예: 10:00~17:00"
               className={inputClass}
             />
           </FormField>
-          <FormField label="공휴일">
+          <FormField id="holidayHours" label="공휴일">
             <input
+              id="holidayHours"
               {...register('holidayHours')}
               placeholder="예: 휴무"
               className={inputClass}

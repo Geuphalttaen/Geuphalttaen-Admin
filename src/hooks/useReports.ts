@@ -8,6 +8,7 @@ import {
   getReport,
   approveReport,
   rejectReport,
+  getReportStats,
 } from '@/lib/api/reports';
 import type { ReportListParams } from '@/types/report';
 
@@ -18,6 +19,7 @@ const reportKeys = {
   list: (params: ReportListParams) => [...reportKeys.lists(), params] as const,
   details: () => [...reportKeys.all, 'detail'] as const,
   detail: (id: number) => [...reportKeys.details(), id] as const,
+  stats: () => [...reportKeys.all, 'stats'] as const,
 };
 
 /**
@@ -53,6 +55,16 @@ export function useApproveReport() {
       // 제보 목록 및 상세 캐시 무효화
       queryClient.invalidateQueries({ queryKey: reportKeys.all });
     },
+  });
+}
+
+/**
+ * 제보 통계 조회 훅
+ */
+export function useReportStats() {
+  return useQuery({
+    queryKey: reportKeys.stats(),
+    queryFn: () => getReportStats(),
   });
 }
 

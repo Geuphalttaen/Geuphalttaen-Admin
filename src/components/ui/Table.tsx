@@ -21,6 +21,8 @@ interface TableProps<T> {
   emptyMessage?: string;
   /** 행 클릭 핸들러 */
   onRowClick?: (row: T) => void;
+  /** I-4: 행 고유 키 추출 함수 — 배열 인덱스 대신 아이템 id 사용 */
+  getRowKey?: (row: T) => string | number;
 }
 
 export default function Table<T>({
@@ -28,6 +30,7 @@ export default function Table<T>({
   data,
   emptyMessage = '데이터가 없습니다.',
   onRowClick,
+  getRowKey,
 }: TableProps<T>) {
   return (
     <div className="overflow-x-auto rounded-lg border border-gray-200">
@@ -57,7 +60,7 @@ export default function Table<T>({
           ) : (
             data.map((row, rowIndex) => (
               <tr
-                key={rowIndex}
+                key={getRowKey ? getRowKey(row) : rowIndex}
                 onClick={onRowClick ? () => onRowClick(row) : undefined}
                 className={onRowClick ? 'cursor-pointer hover:bg-gray-50' : ''}
               >

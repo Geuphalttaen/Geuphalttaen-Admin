@@ -4,40 +4,42 @@
 
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { login } from '@/lib/api/auth';
-import { ACCESS_TOKEN_KEY } from '@/lib/constants';
 
 /**
- * 인증 훅: 로그인 뮤테이션, 로그아웃, 인증 상태 확인
+ * 인증 훅: 로그인 뮤테이션, 로그아웃
+ * 토큰은 httpOnly 쿠키로 관리되며 클라이언트에서 직접 접근 불가
  */
 export function useAuth() {
   const router = useRouter();
 
-  /** 로컬스토리지 토큰 존재 여부로 인증 상태 확인 */
-  const isAuthenticated =
-    typeof window !== 'undefined'
-      ? Boolean(localStorage.getItem(ACCESS_TOKEN_KEY))
-      : false;
-
-  /** 로그인 뮤테이션 */
+  /** 로그인 뮤테이션 — Next.js API 라우트를 통해 httpOnly 쿠키 발급 */
   const loginMutation = useMutation({
-    mutationFn: ({ email, password }: { email: string; password: string }) =>
-      login(email, password),
-    onSuccess: (data) => {
-      // 토큰을 로컬스토리지에 저장 후 대시보드로 이동
-      localStorage.setItem(ACCESS_TOKEN_KEY, data.accessToken);
+    mutationFn: async ({ email, password }: { email: string; password: string }) => {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message ?? '로그인에 실패했습니다.');
+      }
+
+      return res.json();
+    },
+    onSuccess: () => {
       router.push('/dashboard');
     },
   });
 
-  /** 로그아웃: 토큰 제거 후 로그인 페이지로 이동 */
-  const logout = () => {
-    localStorage.removeItem(ACCESS_TOKEN_KEY);
+  /** 로그아웃: Next.js API 라우트를 통해 쿠키 제거 후 로그인 페이지로 이동 */
+  const logout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
     router.push('/login');
   };
 
   return {
-    isAuthenticated,
     loginMutation,
     logout,
   };
