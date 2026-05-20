@@ -1,8 +1,9 @@
 'use client';
 
-// 공공데이터 동기화 페이지 — 동기화 이력 테이블 + 수동 트리거 버튼
+// 공공데이터 동기화 페이지 — CSV 파일 업로드 + 동기화 이력 테이블
 
-import { useSyncStatus, useTriggerSync } from '@/hooks/useSync';
+import { useRef } from 'react';
+import { useSyncStatus, useUploadSync } from '@/hooks/useSync';
 import Button from '@/components/ui/Button';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import PageHeader from '@/components/ui/PageHeader';
@@ -20,41 +21,65 @@ const statusConfig: Record<
 
 export default function SyncPage() {
   const { data: results, isLoading } = useSyncStatus();
-  const triggerMutation = useTriggerSync();
+  const uploadMutation = useUploadSync();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const latest = results?.[0];
-  const isRunning = latest?.status === 'RUNNING';
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    uploadMutation.mutate(file, {
+      onSettled: () => {
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      },
+    });
+  };
 
   return (
     <div className="space-y-6">
-      <PageHeader title="공공데이터 동기화" subtitle="행정안전부 공공데이터와 화장실 정보를 동기화하세요." />
+      <PageHeader title="공공데이터 동기화" subtitle="행정안전부 공공데이터 CSV 파일을 업로드하여 화장실 정보를 동기화하세요." />
 
-      {/* 수동 동기화 트리거 카드 */}
+      {/* CSV 업로드 카드 */}
       <div className="rounded-xl bg-white shadow-sm ring-1 ring-gray-200 p-6">
-        <h2 className="mb-2 text-base font-semibold text-gray-900">수동 동기화 실행</h2>
+        <h2 className="mb-2 text-base font-semibold text-gray-900">CSV 파일 업로드</h2>
         <p className="mb-4 text-sm text-gray-500">
-          행정안전부 공공데이터 API와 화장실 데이터를 즉시 동기화합니다.
-          동기화 중에는 버튼이 비활성화됩니다.
+          <a
+            href="https://www.localdata.go.kr/datafile/each/07_04_02_P.zip"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-indigo-600 hover:underline"
+          >
+            공공데이터 포털
+          </a>
+          에서 다운받은 전국공중화장실표준데이터 CSV 파일을 선택하세요.
+          업로드 후 바로 동기화가 실행되며 완료까지 수 분이 소요될 수 있습니다.
         </p>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".csv"
+          className="hidden"
+          onChange={handleFileChange}
+        />
 
         <Button
           variant="primary"
           size="md"
-          onClick={() => triggerMutation.mutate()}
-          loading={triggerMutation.isPending}
-          disabled={isRunning}
+          onClick={() => fileInputRef.current?.click()}
+          loading={uploadMutation.isPending}
+          disabled={uploadMutation.isPending}
         >
-          {isRunning ? '동기화 진행 중...' : '동기화 시작'}
+          {uploadMutation.isPending ? '동기화 중...' : 'CSV 파일 선택'}
         </Button>
 
-        {triggerMutation.isSuccess && (
+        {uploadMutation.isSuccess && (
           <p className="mt-3 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
-            동기화가 시작되었습니다. 완료까지 시간이 걸릴 수 있습니다.
+            동기화 완료. 아래 이력을 확인하세요.
           </p>
         )}
-        {triggerMutation.isError && (
+        {uploadMutation.isError && (
           <p className="mt-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">
-            동기화 요청에 실패했습니다. 다시 시도하세요.
+            동기화 실패. 파일 형식을 확인하거나 다시 시도하세요.
           </p>
         )}
       </div>
@@ -119,7 +144,7 @@ export default function SyncPage() {
       <div className="bg-gray-50 rounded-xl p-5 text-sm text-gray-600">
         <p className="font-medium text-gray-700">동기화 안내</p>
         <ul className="mt-2 list-disc space-y-1 pl-4">
-          <li>동기화는 30초마다 자동으로 상태가 갱신됩니다.</li>
+          <li>공공데이터 포털에서 전국공중화장실표준데이터(EUC-KR) CSV를 다운받아 업로드하세요.</li>
           <li>대량의 데이터를 처리하므로 완료까지 수 분이 소요될 수 있습니다.</li>
           <li>동기화 중 기존 서비스 이용에는 영향이 없습니다.</li>
         </ul>

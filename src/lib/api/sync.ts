@@ -16,17 +16,16 @@ export interface SyncResult {
   syncedAt: string;
 }
 
-/** 동기화 트리거 응답 */
-export interface SyncTriggerResponse {
-  message: string;
-}
-
 /**
- * 공공데이터 수동 동기화 트리거
+ * 공공데이터 CSV 파일 업로드 → 동기화
  */
-export async function triggerSync(): Promise<SyncTriggerResponse> {
-  const response = await apiClient.post<ApiResponse<SyncTriggerResponse>>(
-    '/api/v1/admin/toilets/sync'
+export async function uploadSyncCsv(file: File): Promise<SyncResult> {
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await apiClient.post<ApiResponse<SyncResult>>(
+    '/api/v1/admin/toilets/sync/upload',
+    formData,
+    { headers: { 'Content-Type': 'multipart/form-data' } }
   );
   return response.data.data;
 }
