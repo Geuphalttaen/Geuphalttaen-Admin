@@ -18,16 +18,23 @@ export interface SyncResult {
 
 /**
  * 공공데이터 CSV 파일 업로드 → 동기화
+ * axios 인스턴스 기본값(Content-Type: application/json)이 FormData를 JSON 직렬화하므로
+ * fetch를 직접 사용 — 브라우저가 boundary 포함한 multipart/form-data를 자동 설정
  */
 export async function uploadSyncCsv(file: File): Promise<SyncResult> {
   const formData = new FormData();
   formData.append('file', file);
-  const response = await apiClient.post<ApiResponse<SyncResult>>(
-    '/api/v1/admin/toilets/sync/upload',
-    formData,
-    { headers: { 'Content-Type': 'multipart/form-data' } }
-  );
-  return response.data.data;
+
+  const res = await fetch('/api/v1/admin/toilets/sync/upload', {
+    method: 'POST',
+    body: formData,
+  });
+
+  const json = (await res.json()) as ApiResponse<SyncResult>;
+  if (!res.ok) {
+    throw new Error((json as { error?: { message?: string } }).error?.message ?? '동기화 실패');
+  }
+  return json.data;
 }
 
 /**

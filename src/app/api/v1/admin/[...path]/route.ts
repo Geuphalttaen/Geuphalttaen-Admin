@@ -24,15 +24,19 @@ async function proxy(request: NextRequest, path: string[]): Promise<NextResponse
     url.searchParams.set(key, value);
   });
 
+  const contentType = request.headers.get('Content-Type') ?? '';
+  const isMultipart = contentType.includes('multipart/form-data');
+
   const headers: HeadersInit = {
-    'Content-Type': 'application/json',
     Authorization: `Bearer ${token}`,
+    ...(!isMultipart && { 'Content-Type': 'application/json' }),
+    ...(isMultipart && { 'Content-Type': contentType }),
   };
 
   let body: BodyInit | undefined;
   const method = request.method;
   if (!['GET', 'HEAD'].includes(method)) {
-    body = await request.text();
+    body = isMultipart ? await request.arrayBuffer() : await request.text();
   }
 
   const res = await fetch(url.toString(), { method, headers, body });
