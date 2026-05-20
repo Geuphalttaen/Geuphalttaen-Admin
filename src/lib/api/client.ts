@@ -1,15 +1,14 @@
-// Axios 인스턴스 설정 — httpOnly 쿠키 자동 전송 및 401 처리
+// Axios 인스턴스 설정 — Next.js 프록시 경유, 401 처리
+// 브라우저 → Next.js /api/v1/admin/* → 백엔드 (프록시가 httpOnly 쿠키 → Authorization 헤더 변환)
 
 import axios from 'axios';
-import { API_BASE_URL } from '@/lib/constants';
 
 const apiClient = axios.create({
-  baseURL: API_BASE_URL,
+  // 빈 베이스URL → 브라우저가 Next.js 서버(동일 오리진) /api/v1/admin/* 로 요청
+  baseURL: '',
   headers: {
     'Content-Type': 'application/json',
   },
-  // httpOnly 쿠키를 요청마다 자동으로 전송
-  withCredentials: true,
 });
 
 // 응답 인터셉터: 401 응답 시 서버 에러 메시지 추출 후 로그인 페이지로 리다이렉트
