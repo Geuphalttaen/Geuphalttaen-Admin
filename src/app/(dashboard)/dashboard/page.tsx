@@ -107,9 +107,9 @@ export default function DashboardPage() {
 
       {/* 현황 요약 카드 — 통계 API 직접 사용 */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatusCard label="대기 중 제보" count={stats?.pending ?? 0} colorClass="text-yellow-600" accent="bg-yellow-400" />
-        <StatusCard label="승인된 화장실" count={stats?.active ?? 0} colorClass="text-green-600" accent="bg-green-400" />
-        <StatusCard label="거절된 제보" count={stats?.rejected ?? 0} colorClass="text-red-600" accent="bg-red-400" />
+        <StatusCard label="대기 중 제보" count={stats?.pending ?? 0} />
+        <StatusCard label="승인된 화장실" count={stats?.active ?? 0} />
+        <StatusCard label="거절된 제보" count={stats?.rejected ?? 0} />
       </div>
 
       {/* 최근 PENDING 제보 목록 */}

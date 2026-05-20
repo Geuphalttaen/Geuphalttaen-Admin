@@ -13,10 +13,10 @@ const syncStatusConfig: Record<
   SyncStatus['status'],
   { label: string; className: string }
 > = {
-  IDLE: { label: '대기', className: 'bg-gray-100 text-gray-700' },
-  RUNNING: { label: '진행 중', className: 'bg-blue-100 text-blue-700' },
-  SUCCESS: { label: '성공', className: 'bg-green-100 text-green-700' },
-  FAILED: { label: '실패', className: 'bg-red-100 text-red-700' },
+  IDLE: { label: '대기', className: 'bg-gray-100 text-gray-600' },
+  RUNNING: { label: '진행 중', className: 'bg-gray-900 text-white' },
+  SUCCESS: { label: '성공', className: 'bg-emerald-50 text-emerald-700' },
+  FAILED: { label: '실패', className: 'bg-gray-100 text-gray-500' },
 };
 
 export default function SyncPage() {
@@ -127,8 +127,8 @@ export default function SyncPage() {
       </div>
 
       {/* 안내 */}
-      <div className="bg-indigo-50 rounded-xl p-5 border-l-4 border-indigo-400 text-sm text-indigo-700">
-        <p className="font-medium">동기화 안내</p>
+      <div className="bg-gray-50 rounded-xl p-5 border-l-4 border-gray-300 text-sm text-gray-600">
+        <p className="font-medium text-gray-700">동기화 안내</p>
         <ul className="mt-2 list-disc space-y-1 pl-4">
           <li>동기화는 30초마다 자동으로 상태가 갱신됩니다.</li>
           <li>대량의 데이터를 처리하므로 완료까지 수 분이 소요될 수 있습니다.</li>

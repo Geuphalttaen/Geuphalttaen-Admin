@@ -21,7 +21,6 @@ export default function PageHeader({ title, subtitle, action }: PageHeaderProps)
         </div>
         {action && <div>{action}</div>}
       </div>
-      <div className="mt-4 border-b border-gray-200" />
     </div>
   );
 }

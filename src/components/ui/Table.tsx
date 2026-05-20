@@ -78,7 +78,7 @@ export default function Table<T>({
               <tr
                 key={getRowKey ? getRowKey(row) : rowIndex}
                 onClick={onRowClick ? () => onRowClick(row) : undefined}
-                className={`border-b border-gray-100 transition-colors ${onRowClick ? 'cursor-pointer hover:bg-blue-50/30' : ''}`}
+                className={`border-b border-gray-100 transition-colors ${onRowClick ? 'cursor-pointer hover:bg-gray-50' : ''}`}
               >
                 {columns.map((col) => (
                   <td
