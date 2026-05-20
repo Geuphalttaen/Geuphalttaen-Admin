@@ -80,14 +80,6 @@ export default function ToiletsPage() {
       ),
     },
     {
-      key: 'source',
-      header: '출처',
-      render: (row) => (
-        <span className="text-xs text-gray-500">{row.source ?? '-'}</span>
-      ),
-      className: 'w-28',
-    },
-    {
       key: 'status',
       header: '상태',
       render: (row) => <Badge status={row.status} />,

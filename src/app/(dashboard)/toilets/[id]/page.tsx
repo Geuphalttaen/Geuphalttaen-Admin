@@ -17,22 +17,16 @@ interface ToiletDetailPageProps {
   params: Promise<{ id: string }>;
 }
 
-/**
- * 화장실 수정 폼 스키마
- * I-2: 위경도는 z.coerce.number()로 HTML string input을 숫자로 자동 변환
- * (react-hook-form의 valueAsNumber 옵션과 함께 사용)
- */
 const updateToiletSchema = z.object({
   name: z.string().min(1, '화장실명을 입력하세요.'),
   address: z.string().min(1, '주소를 입력하세요.'),
-  /** I-2: z.number() + register({ valueAsNumber: true }) 로 string → number 변환 */
-  latitude: z.number({ error: '숫자를 입력하세요.' }),
-  /** I-2: z.number() + register({ valueAsNumber: true }) 로 string → number 변환 */
-  longitude: z.number({ error: '숫자를 입력하세요.' }),
-  description: z.string().optional(),
-  weekdayHours: z.string().optional(),
-  weekendHours: z.string().optional(),
-  holidayHours: z.string().optional(),
+  lat: z.number({ error: '숫자를 입력하세요.' }),
+  lng: z.number({ error: '숫자를 입력하세요.' }),
+  isPublic: z.boolean(),
+  male: z.boolean(),
+  female: z.boolean(),
+  disabled: z.boolean(),
+  familyRoom: z.boolean(),
 });
 
 type UpdateToiletFormValues = z.infer<typeof updateToiletSchema>;
@@ -54,40 +48,25 @@ export default function ToiletDetailPage({ params }: ToiletDetailPageProps) {
     resolver: zodResolver(updateToiletSchema),
   });
 
-  // 데이터 로드 후 폼 초기값 설정
   useEffect(() => {
     if (toilet) {
       reset({
         name: toilet.name,
         address: toilet.address,
-        latitude: toilet.latitude,
-        longitude: toilet.longitude,
-        description: toilet.description ?? '',
-        weekdayHours: toilet.operatingHours?.weekday ?? '',
-        weekendHours: toilet.operatingHours?.weekend ?? '',
-        holidayHours: toilet.operatingHours?.holiday ?? '',
+        lat: toilet.lat,
+        lng: toilet.lng,
+        isPublic: toilet.isPublic,
+        male: toilet.male,
+        female: toilet.female,
+        disabled: toilet.disabled,
+        familyRoom: toilet.familyRoom,
       });
     }
   }, [toilet, reset]);
 
-  /** 폼 제출 처리 — z.coerce.number()로 위경도는 이미 number */
   const onSubmit = (values: UpdateToiletFormValues) => {
     updateMutation.mutate(
-      {
-        id: toiletId,
-        data: {
-          name: values.name,
-          address: values.address,
-          latitude: values.latitude,
-          longitude: values.longitude,
-          description: values.description || undefined,
-          operatingHours: {
-            weekday: values.weekdayHours || undefined,
-            weekend: values.weekendHours || undefined,
-            holiday: values.holidayHours || undefined,
-          },
-        },
-      },
+      { id: toiletId, data: values },
       {
         onSuccess: () => {
           alert('화장실 정보가 수정되었습니다.');
@@ -117,7 +96,6 @@ export default function ToiletDetailPage({ params }: ToiletDetailPageProps) {
 
   return (
     <div className="space-y-6">
-      {/* 상단 네비게이션 */}
       <div className="flex items-center gap-3">
         <Button variant="secondary" size="sm" onClick={() => router.back()}>
           ← 목록으로
@@ -128,7 +106,6 @@ export default function ToiletDetailPage({ params }: ToiletDetailPageProps) {
         </div>
       </div>
 
-      {/* 수정 폼 */}
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="rounded-lg bg-white p-6 shadow-sm border border-gray-200"
@@ -138,88 +115,71 @@ export default function ToiletDetailPage({ params }: ToiletDetailPageProps) {
         </h3>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {/* I-7: label htmlFor 연결 */}
           <FormField id="name" label="화장실명" error={errors.name?.message}>
             <input id="name" {...register('name')} className={inputClass} />
           </FormField>
 
-          <FormField id="address" label="주소" error={errors.address?.message}>
-            <input id="address" {...register('address')} className={inputClass} />
-          </FormField>
-
-          {/* I-2: valueAsNumber로 HTML input string → number 자동 변환 */}
-          <FormField id="latitude" label="위도" error={errors.latitude?.message}>
-            <input
-              id="latitude"
-              type="number"
-              step="any"
-              {...register('latitude', { valueAsNumber: true })}
-              className={inputClass}
-            />
-          </FormField>
-
-          <FormField id="longitude" label="경도" error={errors.longitude?.message}>
-            <input
-              id="longitude"
-              type="number"
-              step="any"
-              {...register('longitude', { valueAsNumber: true })}
-              className={inputClass}
-            />
-          </FormField>
-
           <div className="sm:col-span-2">
-            <FormField id="description" label="설명 (선택)" error={errors.description?.message}>
-              <textarea
-                id="description"
-                {...register('description')}
-                rows={3}
-                className={inputClass}
-              />
+            <FormField id="address" label="주소" error={errors.address?.message}>
+              <input id="address" {...register('address')} className={inputClass} />
             </FormField>
           </div>
+
+          <FormField id="lat" label="위도" error={errors.lat?.message}>
+            <input
+              id="lat"
+              type="number"
+              step="any"
+              {...register('lat', { valueAsNumber: true })}
+              className={inputClass}
+            />
+          </FormField>
+
+          <FormField id="lng" label="경도" error={errors.lng?.message}>
+            <input
+              id="lng"
+              type="number"
+              step="any"
+              {...register('lng', { valueAsNumber: true })}
+              className={inputClass}
+            />
+          </FormField>
         </div>
 
-        {/* 운영 시간 */}
+        {/* 시설 정보 */}
         <h3 className="mb-4 mt-6 text-base font-semibold text-gray-900 border-b border-gray-200 pb-3">
-          운영 시간 (선택)
+          시설 정보
         </h3>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <FormField id="weekdayHours" label="평일">
-            <input
-              id="weekdayHours"
-              {...register('weekdayHours')}
-              placeholder="예: 09:00~18:00"
-              className={inputClass}
-            />
-          </FormField>
-          <FormField id="weekendHours" label="주말">
-            <input
-              id="weekendHours"
-              {...register('weekendHours')}
-              placeholder="예: 10:00~17:00"
-              className={inputClass}
-            />
-          </FormField>
-          <FormField id="holidayHours" label="공휴일">
-            <input
-              id="holidayHours"
-              {...register('holidayHours')}
-              placeholder="예: 휴무"
-              className={inputClass}
-            />
-          </FormField>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {(
+            [
+              { id: 'isPublic', label: '공용 화장실' },
+              { id: 'male', label: '남성용' },
+              { id: 'female', label: '여성용' },
+              { id: 'disabled', label: '장애인용' },
+              { id: 'familyRoom', label: '가족화장실' },
+            ] as const
+          ).map(({ id, label }) => (
+            <label key={id} className="flex items-center gap-2 cursor-pointer select-none">
+              <input
+                id={id}
+                type="checkbox"
+                {...register(id)}
+                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+              />
+              <span className="text-sm text-gray-700">{label}</span>
+            </label>
+          ))}
         </div>
 
         {/* 메타 정보 */}
-        <div className="mt-6 rounded-md bg-gray-50 p-4 text-xs text-gray-500">
+        <div className="mt-6 rounded-md bg-gray-50 p-4 text-xs text-gray-500 space-y-1">
           <p>등록일시: {new Date(toilet.createdAt).toLocaleString('ko-KR')}</p>
           <p>수정일시: {new Date(toilet.updatedAt).toLocaleString('ko-KR')}</p>
-          {toilet.source && <p>출처: {toilet.source}</p>}
+          {toilet.reportedBy && <p>제보자 ID: {toilet.reportedBy}</p>}
         </div>
 
-        {/* 저장 버튼 */}
         <div className="mt-6 flex justify-end gap-3">
           <Button
             type="button"
@@ -241,7 +201,6 @@ export default function ToiletDetailPage({ params }: ToiletDetailPageProps) {
           </Button>
         </div>
 
-        {/* 저장 오류 메시지 */}
         {updateMutation.isError && (
           <p className="mt-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">
             저장에 실패했습니다. 다시 시도하세요.
