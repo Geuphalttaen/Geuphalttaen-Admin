@@ -65,7 +65,10 @@ export default function ToiletDetailPage({ params }: ToiletDetailPageProps) {
   }, [toilet, reset]);
 
   const onSubmit = (values: UpdateToiletFormValues) => {
-    updateMutation.mutate({ id: toiletId, data: values });
+    updateMutation.mutate(
+      { id: toiletId, data: values },
+      { onSuccess: () => reset(values) },
+    );
   };
 
   if (isLoading) {

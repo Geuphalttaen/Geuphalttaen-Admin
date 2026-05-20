@@ -38,7 +38,12 @@ async function proxy(request: NextRequest, path: string[]): Promise<NextResponse
     body = isMultipart ? await request.arrayBuffer() : await request.text();
   }
 
-  const res = await fetch(url.toString(), { method, headers, body });
+  let res: Response;
+  try {
+    res = await fetch(url.toString(), { method, headers, body });
+  } catch {
+    return NextResponse.json({ ok: false, message: '백엔드 서버에 연결할 수 없습니다.' }, { status: 502 });
+  }
 
   const responseText = await res.text();
   return new NextResponse(responseText || null, {
