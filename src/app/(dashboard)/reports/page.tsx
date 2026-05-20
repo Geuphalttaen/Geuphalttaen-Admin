@@ -2,7 +2,7 @@
 
 // 제보 목록 페이지 — 상태 필터 탭 + 페이지네이션 + 승인/거절 처리
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useReports } from '@/hooks/useReports';
 import { useReportAction } from '@/hooks/useReportAction';
@@ -35,10 +35,10 @@ export default function ReportsPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>(initialStatus);
   const [currentPage, setCurrentPage] = useState(0);
 
-  // 필터 변경 시 첫 페이지로 초기화
-  useEffect(() => {
+  const handleStatusChange = (value: StatusFilter) => {
+    setStatusFilter(value);
     setCurrentPage(0);
-  }, [statusFilter]);
+  };
 
   const { data, isLoading } = useReports({
     page: currentPage,
@@ -119,7 +119,7 @@ export default function ReportsPage() {
         {STATUS_TABS.map((tab) => (
           <button
             key={tab.value}
-            onClick={() => setStatusFilter(tab.value)}
+            onClick={() => handleStatusChange(tab.value)}
             className={[
               'rounded-md px-4 py-2 text-sm font-medium transition-colors',
               statusFilter === tab.value

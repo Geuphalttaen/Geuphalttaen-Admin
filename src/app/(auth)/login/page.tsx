@@ -3,10 +3,13 @@
 // 관리자 로그인 페이지 — 스플릿 레이아웃 (브랜드 패널 + 폼 패널)
 
 import Image from 'next/image';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuth } from '@/hooks/useAuth';
+import apiClient from '@/lib/api/client';
 import Button from '@/components/ui/Button';
 
 const loginSchema = z.object({
@@ -17,7 +20,15 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
+  const router = useRouter();
   const { loginMutation } = useAuth();
+
+  useEffect(() => {
+    apiClient
+      .get('/api/v1/admin/reports/stats')
+      .then(() => router.replace('/dashboard'))
+      .catch(() => {});
+  }, [router]);
 
   const {
     register,

@@ -44,10 +44,14 @@ export default function DashboardGroupLayout({
       .then(() => {
         setIsChecking(false);
       })
-      .catch(() => {
-        // 401 또는 네트워크 오류 → 인터셉터가 /login으로 리다이렉트
-        // interceptor가 처리하지 못한 케이스 대비 명시적 리다이렉트
-        router.replace('/login');
+      .catch((err: { response?: { status?: number } }) => {
+        const status = err?.response?.status;
+        if (status === 401 || status === 403) {
+          router.replace('/login');
+        } else {
+          // 백엔드 일시 오류(500, 502 등) — 토큰 무효화가 아니므로 접근 허용
+          setIsChecking(false);
+        }
       });
   }, [router]);
 
