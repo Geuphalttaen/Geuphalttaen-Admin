@@ -11,11 +11,19 @@ export async function POST(request: NextRequest) {
   const { email, password } = body as { email: string; password: string };
 
   // 백엔드 로그인 API 호출
-  const res = await fetch(`${BACKEND_URL}/api/v1/admin/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${BACKEND_URL}/api/v1/admin/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+  } catch {
+    return NextResponse.json(
+      { ok: false, message: '백엔드 서버에 연결할 수 없습니다.' },
+      { status: 502 }
+    );
+  }
 
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
