@@ -14,7 +14,8 @@ export function useSyncStatus() {
   return useQuery({
     queryKey: syncKeys.status(),
     queryFn: getSyncStatus,
-    refetchInterval: 10_000,
+    refetchInterval: (query) =>
+      query.state.data?.some((r) => r.status === 'RUNNING') ? 10_000 : false,
   });
 }
 

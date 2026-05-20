@@ -65,14 +65,7 @@ export default function ToiletDetailPage({ params }: ToiletDetailPageProps) {
   }, [toilet, reset]);
 
   const onSubmit = (values: UpdateToiletFormValues) => {
-    updateMutation.mutate(
-      { id: toiletId, data: values },
-      {
-        onSuccess: () => {
-          alert('화장실 정보가 수정되었습니다.');
-        },
-      }
-    );
+    updateMutation.mutate({ id: toiletId, data: values });
   };
 
   if (isLoading) {
@@ -201,6 +194,11 @@ export default function ToiletDetailPage({ params }: ToiletDetailPageProps) {
           </Button>
         </div>
 
+        {updateMutation.isSuccess && (
+          <p className="mt-3 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+            화장실 정보가 수정되었습니다.
+          </p>
+        )}
         {updateMutation.isError && (
           <p className="mt-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">
             저장에 실패했습니다. 다시 시도하세요.

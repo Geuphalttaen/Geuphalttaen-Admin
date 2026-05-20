@@ -30,10 +30,11 @@ export async function uploadSyncCsv(file: File): Promise<SyncResult> {
     body: formData,
   });
 
-  const json = (await res.json()) as ApiResponse<SyncResult>;
+  const json = (await res.json().catch(() => null)) as ApiResponse<SyncResult> | null;
   if (!res.ok) {
-    throw new Error((json as { error?: { message?: string } }).error?.message ?? '동기화 실패');
+    throw new Error((json as { error?: { message?: string } } | null)?.error?.message ?? '동기화 실패');
   }
+  if (!json) throw new Error('동기화 실패');
   return json.data;
 }
 

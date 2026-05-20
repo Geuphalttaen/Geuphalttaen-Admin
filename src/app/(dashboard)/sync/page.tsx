@@ -105,7 +105,7 @@ export default function SyncPage() {
                 <th className="px-4 py-3 text-left">상태</th>
                 <th className="px-4 py-3 text-right">조회</th>
                 <th className="px-4 py-3 text-right">생성</th>
-                <th className="px-4 py-3 text-right">중복</th>
+                <th className="px-4 py-3 text-right">수정</th>
                 <th className="px-4 py-3 text-right">삭제</th>
                 <th className="px-4 py-3 text-right">실패</th>
                 <th className="px-6 py-3 text-left">메시지</th>
