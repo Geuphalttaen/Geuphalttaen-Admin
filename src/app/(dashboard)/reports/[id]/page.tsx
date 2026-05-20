@@ -9,6 +9,7 @@ import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import PageHeader from '@/components/ui/PageHeader';
 
 interface ReportDetailPageProps {
   params: Promise<{ id: string }>;
@@ -73,16 +74,18 @@ export default function ReportDetailPage({ params }: ReportDetailPageProps) {
 
   return (
     <div className="space-y-6">
-      {/* 상단 네비게이션 */}
-      <div className="flex items-center gap-3">
-        <Button variant="secondary" size="sm" onClick={() => router.back()}>
-          ← 목록으로
-        </Button>
-        <h2 className="text-lg font-semibold text-gray-900">제보 상세</h2>
-      </div>
+      <PageHeader
+        title={report.name}
+        subtitle="제보 상세 정보"
+        action={
+          <Button variant="secondary" size="sm" onClick={() => router.back()}>
+            ← 목록으로
+          </Button>
+        }
+      />
 
       {/* 상세 정보 카드 */}
-      <div className="rounded-lg bg-white p-6 shadow-sm border border-gray-200">
+      <div className="rounded-xl bg-white shadow-sm ring-1 ring-gray-200 p-6">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="font-semibold text-gray-900">{report.name}</h3>
           <Badge status={report.status} />

@@ -17,6 +17,13 @@ const statusClasses: Record<BadgeStatus, string> = {
   REJECTED: 'bg-red-100 text-red-800',
 };
 
+/** 상태별 점 색상 클래스 */
+const dotClasses: Record<BadgeStatus, string> = {
+  PENDING: 'bg-yellow-400',
+  ACTIVE: 'bg-green-400',
+  REJECTED: 'bg-red-400',
+};
+
 /** 상태별 한국어 라벨 */
 const statusLabels: Record<BadgeStatus, string> = {
   PENDING: '대기',
@@ -27,8 +34,9 @@ const statusLabels: Record<BadgeStatus, string> = {
 export default function Badge({ status }: BadgeProps) {
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusClasses[status]}`}
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${statusClasses[status]}`}
     >
+      <span className={`h-1.5 w-1.5 rounded-full ${dotClasses[status]}`} />
       {statusLabels[status]}
     </span>
   );

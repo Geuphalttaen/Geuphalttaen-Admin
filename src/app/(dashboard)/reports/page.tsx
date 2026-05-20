@@ -9,6 +9,7 @@ import { useReportAction } from '@/hooks/useReportAction';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import DataTableSection from '@/components/ui/DataTableSection';
+import PageHeader from '@/components/ui/PageHeader';
 import ReportActionModal from '@/components/reports/ReportActionModal';
 import type { ReportListItem, ReportStatus } from '@/types/report';
 import type { TableColumn } from '@/components/ui/Table';
@@ -111,6 +112,8 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-4">
+      <PageHeader title="제보 관리" subtitle="사용자 제보를 검토하고 승인 또는 거절하세요." />
+
       {/* 상태 필터 탭 */}
       <div className="flex gap-1 rounded-lg bg-gray-100 p-1 w-fit">
         {STATUS_TABS.map((tab) => (

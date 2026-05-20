@@ -9,6 +9,7 @@ import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import Table from '@/components/ui/Table';
 import StatusCard from '@/components/ui/StatusCard';
+import PageHeader from '@/components/ui/PageHeader';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ReportActionModal from '@/components/reports/ReportActionModal';
 import type { ReportListItem } from '@/types/report';
@@ -102,11 +103,13 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      <PageHeader title="대시보드" subtitle="서비스 현황과 최근 제보를 확인하세요." />
+
       {/* 현황 요약 카드 — 통계 API 직접 사용 */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatusCard label="대기 중 제보" count={stats?.pending ?? 0} colorClass="text-yellow-600" />
-        <StatusCard label="승인된 화장실" count={stats?.active ?? 0} colorClass="text-green-600" />
-        <StatusCard label="거절된 제보" count={stats?.rejected ?? 0} colorClass="text-red-600" />
+        <StatusCard label="대기 중 제보" count={stats?.pending ?? 0} colorClass="text-yellow-600" accent="bg-yellow-400" />
+        <StatusCard label="승인된 화장실" count={stats?.active ?? 0} colorClass="text-green-600" accent="bg-green-400" />
+        <StatusCard label="거절된 제보" count={stats?.rejected ?? 0} colorClass="text-red-600" accent="bg-red-400" />
       </div>
 
       {/* 최근 PENDING 제보 목록 */}

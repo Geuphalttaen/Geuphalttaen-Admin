@@ -5,6 +5,7 @@
 import { useSyncStatus, useTriggerSync } from '@/hooks/useSync';
 import Button from '@/components/ui/Button';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import PageHeader from '@/components/ui/PageHeader';
 import type { SyncStatus } from '@/lib/api/sync';
 
 /** 동기화 상태 배지 */
@@ -32,8 +33,10 @@ export default function SyncPage() {
 
   return (
     <div className="space-y-6">
+      <PageHeader title="공공데이터 동기화" subtitle="행정안전부 공공데이터와 화장실 정보를 동기화하세요." />
+
       {/* 동기화 상태 카드 */}
-      <div className="rounded-lg bg-white p-6 shadow-sm border border-gray-200">
+      <div className="rounded-xl bg-white shadow-sm ring-1 ring-gray-200 p-6">
         <h2 className="mb-4 text-base font-semibold text-gray-900">
           공공데이터 동기화 현황
         </h2>
@@ -88,7 +91,7 @@ export default function SyncPage() {
       </div>
 
       {/* 수동 동기화 트리거 카드 */}
-      <div className="rounded-lg bg-white p-6 shadow-sm border border-gray-200">
+      <div className="rounded-xl bg-white shadow-sm ring-1 ring-gray-200 p-6">
         <h2 className="mb-2 text-base font-semibold text-gray-900">
           수동 동기화 실행
         </h2>
@@ -124,7 +127,7 @@ export default function SyncPage() {
       </div>
 
       {/* 안내 */}
-      <div className="rounded-md bg-blue-50 p-4 text-sm text-blue-700">
+      <div className="bg-indigo-50 rounded-xl p-5 border-l-4 border-indigo-400 text-sm text-indigo-700">
         <p className="font-medium">동기화 안내</p>
         <ul className="mt-2 list-disc space-y-1 pl-4">
           <li>동기화는 30초마다 자동으로 상태가 갱신됩니다.</li>

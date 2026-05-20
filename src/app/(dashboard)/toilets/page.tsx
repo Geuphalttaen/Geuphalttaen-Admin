@@ -9,6 +9,7 @@ import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import SearchBar from '@/components/ui/SearchBar';
 import DataTableSection from '@/components/ui/DataTableSection';
+import PageHeader from '@/components/ui/PageHeader';
 import Modal from '@/components/ui/Modal';
 import type { Toilet } from '@/types/toilet';
 import type { TableColumn } from '@/components/ui/Table';
@@ -129,6 +130,8 @@ export default function ToiletsPage() {
 
   return (
     <div className="space-y-4">
+      <PageHeader title="화장실 관리" subtitle="등록된 화장실 목록을 조회하고 수정하세요." />
+
       {/* 검색 바 */}
       <SearchBar
         value={searchInput}
