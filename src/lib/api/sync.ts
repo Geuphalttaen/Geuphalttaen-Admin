@@ -6,9 +6,11 @@ import type { ApiResponse } from '@/types/common';
 /** 동기화 결과 단건 */
 export interface SyncResult {
   id: number;
-  status: 'RUNNING' | 'SUCCESS' | 'FAILED';
+  status: 'RUNNING' | 'SUCCESS' | 'PARTIAL' | 'FAILED';
   totalFetched: number;
-  upsertedCount: number;
+  insertedCount: number;
+  updatedCount: number;
+  deletedCount: number;
   failedCount: number;
   errorMessage: string | null;
   syncedAt: string;

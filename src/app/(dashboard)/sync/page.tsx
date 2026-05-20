@@ -14,6 +14,7 @@ const statusConfig: Record<
 > = {
   RUNNING: { label: '진행 중', className: 'bg-gray-900 text-white' },
   SUCCESS: { label: '성공', className: 'bg-emerald-50 text-emerald-700' },
+  PARTIAL: { label: '부분성공', className: 'bg-amber-50 text-amber-700' },
   FAILED: { label: '실패', className: 'bg-gray-100 text-gray-500' },
 };
 
@@ -78,7 +79,9 @@ export default function SyncPage() {
                 <th className="px-6 py-3 text-left">시각</th>
                 <th className="px-4 py-3 text-left">상태</th>
                 <th className="px-4 py-3 text-right">조회</th>
-                <th className="px-4 py-3 text-right">갱신</th>
+                <th className="px-4 py-3 text-right">생성</th>
+                <th className="px-4 py-3 text-right">중복</th>
+                <th className="px-4 py-3 text-right">삭제</th>
                 <th className="px-4 py-3 text-right">실패</th>
                 <th className="px-6 py-3 text-left">메시지</th>
               </tr>
@@ -98,7 +101,9 @@ export default function SyncPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right tabular-nums text-gray-700">{r.totalFetched.toLocaleString()}</td>
-                    <td className="px-4 py-3 text-right tabular-nums text-gray-700">{r.upsertedCount.toLocaleString()}</td>
+                    <td className="px-4 py-3 text-right tabular-nums text-gray-700">{r.insertedCount.toLocaleString()}</td>
+                    <td className="px-4 py-3 text-right tabular-nums text-gray-700">{r.updatedCount.toLocaleString()}</td>
+                    <td className="px-4 py-3 text-right tabular-nums text-gray-700">{r.deletedCount.toLocaleString()}</td>
                     <td className="px-4 py-3 text-right tabular-nums text-gray-700">{r.failedCount.toLocaleString()}</td>
                     <td className="px-6 py-3 text-gray-500 max-w-xs truncate">
                       {r.errorMessage ?? '—'}
