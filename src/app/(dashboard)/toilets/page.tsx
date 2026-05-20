@@ -7,10 +7,9 @@ import { useRouter } from 'next/navigation';
 import { useToilets, useDeleteToilet } from '@/hooks/useToilets';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import Table from '@/components/ui/Table';
+import SearchBar from '@/components/ui/SearchBar';
+import DataTableSection from '@/components/ui/DataTableSection';
 import Modal from '@/components/ui/Modal';
-import Pagination from '@/components/ui/Pagination';
-import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import type { Toilet } from '@/types/toilet';
 import type { TableColumn } from '@/components/ui/Table';
 
@@ -131,24 +130,14 @@ export default function ToiletsPage() {
   return (
     <div className="space-y-4">
       {/* 검색 바 */}
-      <div className="flex gap-2">
-        <input
-          type="text"
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-          placeholder="화장실명 또는 주소로 검색"
-          className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-        />
-        <Button variant="primary" size="md" onClick={handleSearch}>
-          검색
-        </Button>
-        {keyword && (
-          <Button variant="secondary" size="md" onClick={handleReset}>
-            초기화
-          </Button>
-        )}
-      </div>
+      <SearchBar
+        value={searchInput}
+        onChange={setSearchInput}
+        onSearch={handleSearch}
+        onReset={handleReset}
+        placeholder="화장실명 또는 주소로 검색"
+        showReset={!!keyword}
+      />
 
       {/* 검색 결과 안내 */}
       {keyword && (
@@ -157,35 +146,19 @@ export default function ToiletsPage() {
         </p>
       )}
 
-      {/* 테이블 */}
-      {isLoading ? (
-        <div className="flex justify-center py-20">
-          <LoadingSpinner size="lg" />
-        </div>
-      ) : (
-        <>
-          <Table
-            columns={columns}
-            data={data?.content ?? []}
-            emptyMessage="화장실이 없습니다."
-            onRowClick={(row) => router.push(`/toilets/${row.id}`)}
-            getRowKey={(row) => row.id}
-          />
-
-          {/* 페이지네이션 */}
-          <div className="mt-4">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={data?.totalPages ?? 0}
-              onPageChange={setCurrentPage}
-            />
-          </div>
-
-          <p className="text-center text-sm text-gray-500">
-            총 {data?.totalElements ?? 0}건
-          </p>
-        </>
-      )}
+      {/* 테이블 + 페이지네이션 */}
+      <DataTableSection
+        columns={columns}
+        data={data?.content ?? []}
+        isLoading={isLoading}
+        totalPages={data?.totalPages ?? 0}
+        totalElements={data?.totalElements ?? 0}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+        onRowClick={(row) => router.push(`/toilets/${row.id}`)}
+        getRowKey={(row) => row.id}
+        emptyMessage="화장실이 없습니다."
+      />
 
       {/* 삭제 확인 모달 */}
       <Modal

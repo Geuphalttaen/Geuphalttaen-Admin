@@ -4,13 +4,12 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useReports, useApproveReport, useRejectReport } from '@/hooks/useReports';
+import { useReports } from '@/hooks/useReports';
+import { useReportAction } from '@/hooks/useReportAction';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import Table from '@/components/ui/Table';
-import Modal from '@/components/ui/Modal';
-import Pagination from '@/components/ui/Pagination';
-import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import DataTableSection from '@/components/ui/DataTableSection';
+import ReportActionModal from '@/components/reports/ReportActionModal';
 import type { ReportListItem, ReportStatus } from '@/types/report';
 import type { TableColumn } from '@/components/ui/Table';
 
@@ -46,34 +45,7 @@ export default function ReportsPage() {
     status: statusFilter,
   });
 
-  const approveMutation = useApproveReport();
-  const rejectMutation = useRejectReport();
-
-  // 모달 상태
-  const [modal, setModal] = useState<{
-    isOpen: boolean;
-    type: 'approve' | 'reject';
-    reportId: number | null;
-  }>({ isOpen: false, type: 'approve', reportId: null });
-
-  const openModal = (
-    e: React.MouseEvent,
-    type: 'approve' | 'reject',
-    reportId: number
-  ) => {
-    e.stopPropagation();
-    setModal({ isOpen: true, type, reportId });
-  };
-
-  const handleConfirm = () => {
-    if (!modal.reportId) return;
-    const mutate =
-      modal.type === 'approve' ? approveMutation.mutate : rejectMutation.mutate;
-    mutate(modal.reportId, {
-      onSuccess: () =>
-        setModal({ isOpen: false, type: 'approve', reportId: null }),
-    });
-  };
+  const { modal, openModal, closeModal, handleConfirm, isPending } = useReportAction();
 
   /** 테이블 컬럼 정의 */
   const columns: TableColumn<ReportListItem>[] = [
@@ -117,7 +89,7 @@ export default function ReportsPage() {
               variant="primary"
               size="sm"
               onClick={(e) => openModal(e, 'approve', row.id)}
-              disabled={approveMutation.isPending || rejectMutation.isPending}
+              disabled={isPending}
             >
               승인
             </Button>
@@ -125,7 +97,7 @@ export default function ReportsPage() {
               variant="danger"
               size="sm"
               onClick={(e) => openModal(e, 'reject', row.id)}
-              disabled={approveMutation.isPending || rejectMutation.isPending}
+              disabled={isPending}
             >
               거절
             </Button>
@@ -157,53 +129,27 @@ export default function ReportsPage() {
         ))}
       </div>
 
-      {/* 테이블 */}
-      {isLoading ? (
-        <div className="flex justify-center py-20">
-          <LoadingSpinner size="lg" />
-        </div>
-      ) : (
-        <>
-          <Table
-            columns={columns}
-            data={data?.content ?? []}
-            emptyMessage="제보가 없습니다."
-            onRowClick={(row) => router.push(`/reports/${row.id}`)}
-            getRowKey={(row) => row.id}
-          />
-
-          {/* 페이지네이션 */}
-          <div className="mt-4">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={data?.totalPages ?? 0}
-              onPageChange={setCurrentPage}
-            />
-          </div>
-
-          {/* 총 건수 */}
-          <p className="text-center text-sm text-gray-500">
-            총 {data?.totalElements ?? 0}건
-          </p>
-        </>
-      )}
+      {/* 테이블 + 페이지네이션 */}
+      <DataTableSection
+        columns={columns}
+        data={data?.content ?? []}
+        isLoading={isLoading}
+        totalPages={data?.totalPages ?? 0}
+        totalElements={data?.totalElements ?? 0}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+        onRowClick={(row) => router.push(`/reports/${row.id}`)}
+        getRowKey={(row) => row.id}
+        emptyMessage="제보가 없습니다."
+      />
 
       {/* 승인/거절 확인 모달 */}
-      <Modal
+      <ReportActionModal
         isOpen={modal.isOpen}
-        title={modal.type === 'approve' ? '제보 승인' : '제보 거절'}
-        message={
-          modal.type === 'approve'
-            ? '이 제보를 승인하시겠습니까?'
-            : '이 제보를 거절하시겠습니까? 취소할 수 없습니다.'
-        }
-        confirmLabel={modal.type === 'approve' ? '승인' : '거절'}
-        confirmVariant={modal.type === 'approve' ? 'primary' : 'danger'}
-        loading={approveMutation.isPending || rejectMutation.isPending}
+        type={modal.type}
+        loading={isPending}
         onConfirm={handleConfirm}
-        onCancel={() =>
-          setModal({ isOpen: false, type: 'approve', reportId: null })
-        }
+        onCancel={closeModal}
       />
     </div>
   );

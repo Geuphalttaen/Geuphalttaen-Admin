@@ -10,6 +10,7 @@ import { z } from 'zod';
 import { useToilet, useUpdateToilet } from '@/hooks/useToilets';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
+import FormField from '@/components/ui/FormField';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 interface ToiletDetailPageProps {
@@ -35,30 +36,6 @@ const updateToiletSchema = z.object({
 });
 
 type UpdateToiletFormValues = z.infer<typeof updateToiletSchema>;
-
-/** 폼 입력 필드 컴포넌트 */
-function FormField({
-  label,
-  id,
-  error,
-  children,
-}: {
-  label: string;
-  /** I-7: label htmlFor 연결을 위한 id */
-  id?: string;
-  error?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <label htmlFor={id} className="mb-1 block text-sm font-medium text-gray-700">
-        {label}
-      </label>
-      {children}
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
-    </div>
-  );
-}
 
 export default function ToiletDetailPage({ params }: ToiletDetailPageProps) {
   const { id } = use(params);

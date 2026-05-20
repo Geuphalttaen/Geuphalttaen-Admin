@@ -2,34 +2,17 @@
 
 // 대시보드 페이지 — 제보 현황 요약 카드 + 최근 PENDING 제보 목록
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useReports, useReportStats, useApproveReport, useRejectReport } from '@/hooks/useReports';
+import { useReports, useReportStats } from '@/hooks/useReports';
+import { useReportAction } from '@/hooks/useReportAction';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import Table from '@/components/ui/Table';
-import Modal from '@/components/ui/Modal';
+import StatusCard from '@/components/ui/StatusCard';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import ReportActionModal from '@/components/reports/ReportActionModal';
 import type { ReportListItem } from '@/types/report';
 import type { TableColumn } from '@/components/ui/Table';
-
-/** 현황 카드 컴포넌트 */
-function StatusCard({
-  label,
-  count,
-  colorClass,
-}: {
-  label: string;
-  count: number;
-  colorClass: string;
-}) {
-  return (
-    <div className="rounded-lg bg-white p-6 shadow-sm border border-gray-200">
-      <p className="text-sm font-medium text-gray-600">{label}</p>
-      <p className={`mt-2 text-3xl font-bold ${colorClass}`}>{count}</p>
-    </div>
-  );
-}
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -44,41 +27,8 @@ export default function DashboardPage() {
     status: 'PENDING',
   });
 
-  const approveMutation = useApproveReport();
-  const rejectMutation = useRejectReport();
-
-  // 모달 상태
-  const [modal, setModal] = useState<{
-    isOpen: boolean;
-    type: 'approve' | 'reject';
-    reportId: number | null;
-  }>({ isOpen: false, type: 'approve', reportId: null });
-
-  /** 승인/거절 모달 열기 */
-  const openModal = (
-    e: React.MouseEvent,
-    type: 'approve' | 'reject',
-    reportId: number
-  ) => {
-    e.stopPropagation();
-    setModal({ isOpen: true, type, reportId });
-  };
-
-  /** 모달 확인 처리 */
-  const handleConfirm = () => {
-    if (!modal.reportId) return;
-    if (modal.type === 'approve') {
-      approveMutation.mutate(modal.reportId, {
-        // I-3: 모달 reset 시 type을 현재 type으로 유지
-        onSuccess: () => setModal({ isOpen: false, type: 'approve', reportId: null }),
-      });
-    } else {
-      rejectMutation.mutate(modal.reportId, {
-        // I-3: 거절 성공 후 type을 'reject'로 올바르게 유지
-        onSuccess: () => setModal({ isOpen: false, type: 'reject', reportId: null }),
-      });
-    }
-  };
+  const { modal, openModal, closeModal, handleConfirm, approvePending, rejectPending } =
+    useReportAction();
 
   /** 테이블 컬럼 정의 */
   const columns: TableColumn<ReportListItem>[] = [
@@ -122,7 +72,7 @@ export default function DashboardPage() {
               variant="primary"
               size="sm"
               onClick={(e) => openModal(e, 'approve', row.id)}
-              loading={approveMutation.isPending && modal.reportId === row.id}
+              loading={approvePending && modal.reportId === row.id}
             >
               승인
             </Button>
@@ -130,7 +80,7 @@ export default function DashboardPage() {
               variant="danger"
               size="sm"
               onClick={(e) => openModal(e, 'reject', row.id)}
-              loading={rejectMutation.isPending && modal.reportId === row.id}
+              loading={rejectPending && modal.reportId === row.id}
             >
               거절
             </Button>
@@ -188,19 +138,12 @@ export default function DashboardPage() {
       </div>
 
       {/* 승인/거절 확인 모달 */}
-      <Modal
+      <ReportActionModal
         isOpen={modal.isOpen}
-        title={modal.type === 'approve' ? '제보 승인' : '제보 거절'}
-        message={
-          modal.type === 'approve'
-            ? '이 제보를 승인하시겠습니까? 화장실이 서비스에 등록됩니다.'
-            : '이 제보를 거절하시겠습니까? 취소할 수 없습니다.'
-        }
-        confirmLabel={modal.type === 'approve' ? '승인' : '거절'}
-        confirmVariant={modal.type === 'approve' ? 'primary' : 'danger'}
-        loading={approveMutation.isPending || rejectMutation.isPending}
+        type={modal.type}
+        loading={approvePending || rejectPending}
         onConfirm={handleConfirm}
-        onCancel={() => setModal({ isOpen: false, type: 'approve', reportId: null })}
+        onCancel={closeModal}
       />
     </div>
   );
