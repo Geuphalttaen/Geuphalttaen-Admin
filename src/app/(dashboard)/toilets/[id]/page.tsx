@@ -208,6 +208,32 @@ export default function ToiletDetailPage({ params }: ToiletDetailPageProps) {
           </p>
         )}
       </form>
+
+      {/* 첨부 사진 갤러리 (읽기 전용) */}
+      {toilet.imageUrls.length > 0 && (
+        <div className="rounded-xl bg-white shadow-sm ring-1 ring-gray-200 p-6">
+          <h3 className="mb-4 font-semibold text-gray-900">
+            첨부 사진 ({toilet.imageUrls.length}장)
+          </h3>
+          <div className="grid grid-cols-3 gap-3">
+            {toilet.imageUrls.map((url, index) => (
+              <a
+                key={url}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block overflow-hidden rounded-lg ring-1 ring-gray-200 hover:ring-indigo-400 transition-all"
+              >
+                <img
+                  src={url}
+                  alt={`화장실 사진 ${index + 1}`}
+                  className="h-40 w-full object-cover"
+                />
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -15,6 +15,7 @@ export interface Toilet {
   female: boolean;
   disabled: boolean;
   familyRoom: boolean;
+  imageUrls: string[];
   reportedBy: number | null;
   status: ToiletStatus;
   createdAt: string;
