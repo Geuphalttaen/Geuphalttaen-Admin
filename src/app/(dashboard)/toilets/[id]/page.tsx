@@ -218,7 +218,7 @@ export default function ToiletDetailPage({ params }: ToiletDetailPageProps) {
           <div className="grid grid-cols-3 gap-3">
             {toilet.imageUrls.map((url, index) => (
               <a
-                key={url}
+                key={`${url}-${index}`}
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -228,6 +228,7 @@ export default function ToiletDetailPage({ params }: ToiletDetailPageProps) {
                   src={url}
                   alt={`화장실 사진 ${index + 1}`}
                   className="h-40 w-full object-cover"
+                  loading="lazy"
                 />
               </a>
             ))}

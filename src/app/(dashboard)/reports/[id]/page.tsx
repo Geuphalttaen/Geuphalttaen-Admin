@@ -129,15 +129,10 @@ export default function ReportDetailPage({ params }: ReportDetailPageProps) {
               <FacilityBadge label="여성용" enabled={report.female} />
               <FacilityBadge label="장애인용" enabled={report.disabled} />
               <FacilityBadge label="수유실" enabled={report.familyRoom} />
-              <span
-                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                  report.isPublic
-                    ? 'bg-emerald-100 text-emerald-700'
-                    : 'bg-gray-100 text-gray-400'
-                }`}
-              >
-                {report.isPublic ? '공용 화장실' : '비공용 화장실'}
-              </span>
+              <FacilityBadge
+                label={report.isPublic ? '공용 화장실' : '비공용 화장실'}
+                enabled={report.isPublic}
+              />
             </div>
           </DetailRow>
           <DetailRow label="제보자 ID">#{report.reportedBy}</DetailRow>
@@ -159,7 +154,7 @@ export default function ReportDetailPage({ params }: ReportDetailPageProps) {
           <div className="grid grid-cols-3 gap-3">
             {report.imageUrls.map((url, index) => (
               <a
-                key={url}
+                key={`${url}-${index}`}
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -169,6 +164,7 @@ export default function ReportDetailPage({ params }: ReportDetailPageProps) {
                   src={url}
                   alt={`제보 첨부 사진 ${index + 1}`}
                   className="h-40 w-full object-cover"
+                  loading="lazy"
                 />
               </a>
             ))}
