@@ -25,6 +25,21 @@ function DetailRow({ label, children }: { label: string; children: React.ReactNo
   );
 }
 
+/** 시설 뱃지 컴포넌트 */
+function FacilityBadge({ label, enabled }: { label: string; enabled: boolean }) {
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+        enabled
+          ? 'bg-emerald-100 text-emerald-700'
+          : 'bg-gray-100 text-gray-400'
+      }`}
+    >
+      {label}
+    </span>
+  );
+}
+
 export default function ReportDetailPage({ params }: ReportDetailPageProps) {
   const { id } = use(params);
   const reportId = Number(id);
@@ -97,10 +112,10 @@ export default function ReportDetailPage({ params }: ReportDetailPageProps) {
           <DetailRow label="주소">{report.address}</DetailRow>
           <DetailRow label="좌표">
             <span className="font-mono text-xs">
-              위도: {report.latitude}, 경도: {report.longitude}
+              위도: {report.lat}, 경도: {report.lng}
             </span>
             <a
-              href={`https://maps.google.com/?q=${report.latitude},${report.longitude}`}
+              href={`https://maps.google.com/?q=${report.lat},${report.lng}`}
               target="_blank"
               rel="noopener noreferrer"
               className="ml-3 text-blue-600 hover:underline text-xs"
@@ -108,10 +123,19 @@ export default function ReportDetailPage({ params }: ReportDetailPageProps) {
               지도에서 보기 ↗
             </a>
           </DetailRow>
-          {report.description && (
-            <DetailRow label="설명">{report.description}</DetailRow>
-          )}
-          <DetailRow label="제보자 ID">#{report.userId}</DetailRow>
+          <DetailRow label="시설">
+            <div className="flex flex-wrap gap-1.5">
+              <FacilityBadge label="남성용" enabled={report.male} />
+              <FacilityBadge label="여성용" enabled={report.female} />
+              <FacilityBadge label="장애인용" enabled={report.disabled} />
+              <FacilityBadge label="수유실" enabled={report.familyRoom} />
+              <FacilityBadge
+                label={report.isPublic ? '공용 화장실' : '비공용 화장실'}
+                enabled={report.isPublic}
+              />
+            </div>
+          </DetailRow>
+          <DetailRow label="제보자 ID">#{report.reportedBy}</DetailRow>
           <DetailRow label="제보일시">
             {new Date(report.createdAt).toLocaleString('ko-KR')}
           </DetailRow>
@@ -120,6 +144,33 @@ export default function ReportDetailPage({ params }: ReportDetailPageProps) {
           </DetailRow>
         </dl>
       </div>
+
+      {/* 첨부 사진 갤러리 */}
+      {report.imageUrls.length > 0 && (
+        <div className="rounded-xl bg-white shadow-sm ring-1 ring-gray-200 p-6">
+          <h3 className="mb-4 font-semibold text-gray-900">
+            첨부 사진 ({report.imageUrls.length}장)
+          </h3>
+          <div className="grid grid-cols-3 gap-3">
+            {report.imageUrls.map((url, index) => (
+              <a
+                key={`${url}-${index}`}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block overflow-hidden rounded-lg ring-1 ring-gray-200 hover:ring-indigo-400 transition-all"
+              >
+                <img
+                  src={url}
+                  alt={`제보 첨부 사진 ${index + 1}`}
+                  className="h-40 w-full object-cover"
+                  loading="lazy"
+                />
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* 처리 버튼 (PENDING 상태일 때만 표시) */}
       {report.status === 'PENDING' && (

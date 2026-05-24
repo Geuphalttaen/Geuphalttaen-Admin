@@ -3,15 +3,20 @@
 /** 제보 상태 */
 export type ReportStatus = 'ACTIVE' | 'PENDING' | 'REJECTED';
 
-/** 제보 상세 정보 */
+/** 제보 상세 정보 — AdminReportResponse */
 export interface Report {
   id: number;
-  userId: number;
+  reportedBy: number;
   name: string;
   address: string;
-  latitude: number;
-  longitude: number;
-  description?: string;
+  lat: number;
+  lng: number;
+  isPublic: boolean;
+  male: boolean;
+  female: boolean;
+  disabled: boolean;
+  familyRoom: boolean;
+  imageUrls: string[];
   status: ReportStatus;
   createdAt: string;
   updatedAt: string;
