@@ -21,7 +21,11 @@ apiClient.interceptors.response.use(
       error.message = serverMessage;
     }
 
-    if (error.response?.status === 401 && typeof window !== 'undefined') {
+    if (
+      error.response?.status === 401 &&
+      typeof window !== 'undefined' &&
+      !window.location.pathname.startsWith('/login')
+    ) {
       window.location.href = '/login';
     }
     return Promise.reject(error);
