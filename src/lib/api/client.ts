@@ -11,11 +11,13 @@ const apiClient = axios.create({
   },
 });
 
+// 인증 없이 접근 가능한 경로 — 401 리다이렉트 제외 목록
+const AUTH_PATHS = ['/login'];
+
 // 응답 인터셉터: 401 응답 시 서버 에러 메시지 추출 후 로그인 페이지로 리다이렉트
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    // I-5: 서버 에러 메시지 추출
     const serverMessage = error.response?.data?.error?.message;
     if (serverMessage) {
       error.message = serverMessage;
@@ -24,7 +26,7 @@ apiClient.interceptors.response.use(
     if (
       error.response?.status === 401 &&
       typeof window !== 'undefined' &&
-      !window.location.pathname.startsWith('/login')
+      !AUTH_PATHS.some((p) => window.location.pathname.startsWith(p))
     ) {
       window.location.href = '/login';
     }

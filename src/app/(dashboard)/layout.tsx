@@ -53,8 +53,7 @@ export default function DashboardGroupLayout({
           setIsChecking(false);
         }
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [router]);
 
   // 인증 확인 중 로딩 표시
   if (isChecking) {
