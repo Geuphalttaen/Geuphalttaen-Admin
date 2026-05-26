@@ -24,11 +24,15 @@ export default function LoginPage() {
   const { loginMutation } = useAuth();
 
   useEffect(() => {
-    apiClient
-      .get('/api/v1/admin/reports/stats')
-      .then(() => router.replace('/dashboard'))
+    // apiClient 대신 fetch 사용 — apiClient의 401 인터셉터가 /login 리다이렉트를 유발해
+    // 로그인 페이지에서 무한 루프가 발생하는 문제 방지
+    fetch('/api/v1/admin/reports/stats')
+      .then((res) => {
+        if (res.ok) router.replace('/dashboard');
+      })
       .catch(() => {});
-  }, [router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const {
     register,
