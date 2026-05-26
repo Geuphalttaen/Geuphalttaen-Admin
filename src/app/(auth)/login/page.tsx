@@ -3,7 +3,6 @@
 // 관리자 로그인 페이지 — 스플릿 레이아웃 (브랜드 패널 + 폼 패널)
 
 import Image from 'next/image';
-import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -22,17 +21,6 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const router = useRouter();
   const { loginMutation } = useAuth();
-
-  useEffect(() => {
-    // apiClient 대신 fetch 사용 — apiClient의 401 인터셉터가 /login 리다이렉트를 유발해
-    // 로그인 페이지에서 무한 루프가 발생하는 문제 방지
-    fetch('/api/v1/admin/reports/stats')
-      .then((res) => {
-        if (res.ok) router.replace('/dashboard');
-      })
-      .catch(() => {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const {
     register,
