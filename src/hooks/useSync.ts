@@ -15,7 +15,7 @@ export function useSyncStatus() {
     queryKey: syncKeys.status(),
     queryFn: getSyncStatus,
     refetchInterval: (query) =>
-      query.state.data?.some((r) => r.status === 'RUNNING') ? 10_000 : false,
+      query.state.data?.some((r) => r.status === 'IN_PROGRESS') ? 10_000 : false,
   });
 }
 
