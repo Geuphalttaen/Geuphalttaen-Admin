@@ -13,7 +13,7 @@ const statusConfig: Record<
   SyncResult['status'],
   { label: string; className: string }
 > = {
-  RUNNING: { label: '진행 중', className: 'bg-gray-900 text-white' },
+  IN_PROGRESS: { label: '진행 중', className: 'bg-blue-50 text-blue-700' },
   SUCCESS: { label: '성공', className: 'bg-emerald-50 text-emerald-700' },
   PARTIAL: { label: '부분성공', className: 'bg-amber-50 text-amber-700' },
   FAILED: { label: '실패', className: 'bg-gray-100 text-gray-500' },
@@ -121,7 +121,7 @@ export default function SyncPage() {
                     </td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${cfg.className}`}>
-                        {r.status === 'RUNNING' && <LoadingSpinner size="sm" />}
+                        {r.status === 'IN_PROGRESS' && <LoadingSpinner size="sm" />}
                         {cfg.label}
                       </span>
                     </td>
