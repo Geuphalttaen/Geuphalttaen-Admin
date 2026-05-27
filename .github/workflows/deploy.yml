@@ -12,6 +12,8 @@ jobs:
     concurrency:
       group: deploy-admin-production
       cancel-in-progress: false
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
@@ -35,3 +37,9 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy
+
+      - name: Create Release Tag
+        run: |
+          VERSION="v$(date -u +'%Y.%m.%d')-$(git rev-parse --short HEAD)"
+          git tag "$VERSION"
+          git push origin "$VERSION"
