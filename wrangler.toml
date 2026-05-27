@@ -9,3 +9,7 @@ binding = "ASSETS"
 
 [vars]
 BACKEND_URL = "https://api.geuphalttaen.com"
+
+routes = [
+  { pattern = "admin.geuphalttaen.com", custom_domain = true }
+]
