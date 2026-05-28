@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 급할땐 — Admin
 
-## Getting Started
+급할땐 서비스 관리자 대시보드 (Next.js 16 + TypeScript)
 
-First, run the development server:
+## 주요 기능
+
+- 화장실 제보 목록 조회 및 승인/거절 처리
+- 화장실 데이터 목록 조회 및 상세 확인
+- 공공데이터 API 동기화 실행 및 상태 모니터링
+- 관리자 로그인 (JWT)
+
+## 기술 스택
+
+| 구분 | 기술 |
+|------|------|
+| 프레임워크 | Next.js 16 (App Router) |
+| 언어 | TypeScript |
+| 서버 상태 | TanStack Query v5 |
+| 폼 | React Hook Form + zod |
+| 스타일 | Tailwind CSS v4 |
+| HTTP | axios |
+| 배포 | Cloudflare Pages (OpenNext) |
+
+## 시작하기
+
+### 환경 변수 설정
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 실행
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm install
+pnpm dev
+```
 
-## Learn More
+http://localhost:3000 접속
 
-To learn more about Next.js, take a look at the following resources:
+### 빌드
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+pnpm build
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 화면 구성
 
-## Deploy on Vercel
+| 경로 | 설명 |
+|------|------|
+| `/login` | 관리자 로그인 |
+| `/dashboard` | 요약 통계 |
+| `/reports` | 제보 목록 (승인/거절) |
+| `/reports/[id]` | 제보 상세 |
+| `/toilets` | 화장실 목록 |
+| `/toilets/[id]` | 화장실 상세 |
+| `/sync` | 공공데이터 동기화 |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 관련 레포
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [geuphalttaen-server](../geuphalttaen-server) — Spring Boot 백엔드
+- [geuphalttaen-app](../geuphalttaen-new-app) — React Native 앱
